@@ -1,0 +1,26 @@
+{
+  "name": "react-native-fading-scrollview",
+  "version": "1.0.0",
+  "description": "Allowing fade effects on top of react-native ScrollView component",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenop/react-native-fading-scrollview.git"
+  },
+  "keywords": [
+    "\"scrollview\"",
+    "\"scrollview",
+    "fade\""
+  ],
+  "author": "Chen Oppenhaim",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/chenop/react-native-fading-scrollview/issues"
+  },
+  "homepage": "https://github.com/chenop/react-native-fading-scrollview#readme"
+}
