@@ -1,14 +1,15 @@
-import React, {Component, useState} from 'react';
-import { StyleSheet, ScrollView, View, Platform } from 'react-native';
+import React, {useState} from 'react';
+import {Platform, ScrollView, StyleSheet, View} from 'react-native';
 import PropTypes from "prop-types";
 import LinearGradient from "react-native-linear-gradient"
+
 const defaultFadeColors = ['rgba(229, 229, 229, 0.18)', 'rgba(206, 201, 201, 0.6)', 'rgba(206, 201, 201, 0.9)'];
 
 const RNFadedScrollView = ({
                                onContentSizeChange, horizontal, scrollThreshold, isRtl,
                                isCloseToStart, isCloseToEnd, allowStartFade, allowEndFade, onScroll,
                                fadeColors, startFadeStyle, endFadeStyle, fadeSize, containerStyle, allowDivider,
-                               innerRef, style, children
+                               innerRef, style, children, dividerStyle, ...rest
                            }) => {
     const [scrollHeight, setScrollHeight] = useState(0);
     const [scrollWidth, setScrollWidth] = useState(0);
@@ -36,111 +37,111 @@ const RNFadedScrollView = ({
 
     const isEndFadeAllowed = () => {
         const sizeToCompare = horizontal ? scrollWidth : scrollHeight;
-        const availableSpace = this.props.horizontal ? availableWidth : availableHeight;
-        return this.props.allowEndFade ? sizeToCompare > availableSpace : false;
+        const availableSpace = horizontal ? availableWidth : availableHeight;
+        return allowEndFade ? sizeToCompare > availableSpace : false;
     }
 
     const ifCloseToStart = ({layoutMeasurement, contentOffset, contentSize}) => {
-        return this.props.horizontal ? contentOffset.x < this.props.scrollThreshold : contentOffset.y < this.props.scrollThreshold;
+        return horizontal ? contentOffset.x < scrollThreshold : contentOffset.y < scrollThreshold;
     }
 
     const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
-        return this.props.horizontal ? layoutMeasurement.width + contentOffset.x >= contentSize.width - this.props.scrollThreshold : layoutMeasurement.height + contentOffset.y >= contentSize.height - this.props.scrollThreshold;
+        return horizontal ? layoutMeasurement.width + contentOffset.x >= contentSize.width - scrollThreshold : layoutMeasurement.height + contentOffset.y >= contentSize.height - scrollThreshold;
     }
 
     //To avoid ScrollView RTL issue on andorid.
     const allowReverse = () => {
-        return Platform.OS == 'android' && this.props.isRtl
+        return Platform.OS == 'android' && isRtl
     }
 
     const onScrolled = (e) => {
-        if (this.props.isCloseToEnd) {
-            this.props.isCloseToEnd(this.isCloseToBottom(e.nativeEvent));
+        if (isCloseToEnd) {
+            isCloseToEnd(isCloseToBottom(e.nativeEvent));
         }
-        if (this.props.isCloseToStart) {
-            this.props.isCloseToStart(this.ifCloseToStart(e.nativeEvent));
+        if (isCloseToStart) {
+            isCloseToStart(ifCloseToStart(e.nativeEvent));
         }
-        if (this.props.allowStartFade) {
-            if (!this.allowReverse()) {
-                this.setState({allowStartFade: this.ifCloseToStart(e.nativeEvent) ? false : true})
+        if (allowStartFade) {
+            if (!allowReverse()) {
+                setAllowStartFade(!ifCloseToStart(e.nativeEvent));
             } else {
-                this.setState({allowEndFade: this.ifCloseToStart(e.nativeEvent) ? false : true})
+                setAllowEndFade(!ifCloseToStart(e.nativeEvent));
             }
         }
-        if (this.props.allowEndFade) {
-            if (!this.allowReverse()) {
-                this.setState({allowEndFade: this.isCloseToBottom(e.nativeEvent) ? false : true})
+        if (allowEndFade) {
+            if (!allowReverse()) {
+                setAllowEndFade(!isCloseToBottom(e.nativeEvent));
             } else {
-                this.setState({allowStartFade: this.isCloseToBottom(e.nativeEvent) ? false : true})
+                setAllowStartFade(!isCloseToBottom(e.nativeEvent));
             }
         }
-        if (this.props.onScroll) {
-            this.props.onScroll();
+        if (onScroll) {
+            onScroll();
         }
     }
 
     //get start fade view
     const getStartFaade = () => {
-        return (this.props.horizontal ?
+        return (horizontal ?
                 <LinearGradient
-                    start={{x: this.props.isRtl ? 0 : 1, y: 0}} end={{x: this.props.isRtl ? 1 : 0, y: 0}}
-                    style={[{position: 'absolute', start: 0, width: this.props.fadeSize, height: '100%'}, this.props.startFadeStyle]}
-                    colors={this.props.fadeColors}
+                    start={{x: isRtl ? 0 : 1, y: 0}} end={{x: isRtl ? 1 : 0, y: 0}}
+                    style={[{position: 'absolute', start: 0, width: fadeSize, height: '100%'}, startFadeStyle]}
+                    colors={fadeColors}
                     pointerEvents={'none'}
                 /> :
                 <LinearGradient
                     start={{x: 0, y: 1}} end={{x: 0, y: 0}}
-                    style={[{position: 'absolute', top: 0, width: '100%', height: this.props.fadeSize}, this.props.startFadeStyle]}
-                    colors={this.props.fadeColors}
+                    style={[{position: 'absolute', top: 0, width: '100%', height: fadeSize}, startFadeStyle]}
+                    colors={fadeColors}
                     pointerEvents={'none'}
                 />
         )
     }
 
     const getEndFade = () => {
-        return (this.props.horizontal ?
+        return (horizontal ?
             <LinearGradient
-                start={{x: this.props.isRtl ? 1 : 0, y: 0}} end={{x: this.props.isRtl ? 0 : 1, y: 0}}
-                style={[{position: 'absolute', end: 0, width: this.props.fadeSize, height: '100%'}, this.props.endFadeStyle]}
-                colors={this.props.fadeColors}
+                start={{x: isRtl ? 1 : 0, y: 0}} end={{x: isRtl ? 0 : 1, y: 0}}
+                style={[{position: 'absolute', end: 0, width: fadeSize, height: '100%'}, endFadeStyle]}
+                colors={fadeColors}
                 pointerEvents={'none'}
             />
             :
             <LinearGradient
                 start={{x: 0, y: 0}} end={{x: 0, y: 1}}
-                style={[{position: 'absolute', bottom: 0, width: '100%', height: this.props.fadeSize}, this.props.endFadeStyle]}
-                colors={this.props.fadeColors}
+                style={[{position: 'absolute', bottom: 0, width: '100%', height: fadeSize}, endFadeStyle]}
+                colors={fadeColors}
                 pointerEvents={'none'}
             />)
     }
 
     const getDivider = () => {
-        return (this.props.horizontal ? <View
-            style={[{width: 1, height: '100%', backgroundColor: "#E6E6E6"}, this.props.dividerStyle]}
+        return (horizontal ? <View
+            style={[{width: 1, height: '100%', backgroundColor: "#E6E6E6"}, dividerStyle]}
         /> : <View
-            style={[{width: '100%', height: 1, backgroundColor: "#E6E6E6"}, this.props.dividerStyle]}
+            style={[{width: '100%', height: 1, backgroundColor: "#E6E6E6"}, dividerStyle]}
         />)
     }
 
-    const endFadeEnable = this.isEndFadeAllowed();
+    const endFadeEnable = isEndFadeAllowed();
 
     return (
-        <View style={[styles.container, this.props.containerStyle, {flexDirection: this.props.horizontal ? "row" : "column"}]}
+        <View style={[styles.container, containerStyle, {flexDirection: horizontal ? "row" : "column"}]}
               onLayout={handleLayout}>
-            {(this.state.allowStartFade && this.props.allowDivider) && this.getDivider()}
+            {(allowStartFade && allowDivider) && getDivider()}
             <ScrollView
-                {...this.props}
-                ref={this.props.innerRef}
-                style={[styles.scrollViewStyle, this.props.style]}
+                {...rest}
+                ref={innerRef}
+                style={[styles.scrollViewStyle, style]}
                 onContentSizeChange={handleContentSizeChange}
                 scrollEventThrottle={16}
-                onScroll={this.onScrolled}
+                onScroll={onScrolled}
             >
-                {this.props.children}
+                {children}
             </ScrollView>
-            {((endFadeEnable && this.state.allowEndFade) && this.props.allowDivider) && this.getDivider()}
-            {(this.state.allowStartFade) && this.getStartFaade()}
-            {(endFadeEnable && this.state.allowEndFade) && this.getEndFade()}
+            {((endFadeEnable && allowEndFade) && allowDivider) && getDivider()}
+            {(allowStartFade) && getStartFaade()}
+            {(endFadeEnable && allowEndFade) && getEndFade()}
         </View>
     );
 };
