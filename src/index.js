@@ -51,7 +51,7 @@ const RNFadedScrollView = ({
 
     //To avoid ScrollView RTL issue on andorid.
     const allowReverse = () => {
-        return Platform.OS == 'android' && isRtl
+        return Platform.OS === 'android' && isRtl
     }
 
     const onScrolled = (e) => {
