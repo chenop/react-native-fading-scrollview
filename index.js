@@ -7,7 +7,7 @@ const defaultFadeColors = ['rgba(229, 229, 229, 0.18)', 'rgba(206, 201, 201, 0.6
 
 const RNFadedScrollView = ({
                                onContentSizeChange, horizontal, scrollThreshold, isRtl,
-                               isCloseToStart, isCloseToEnd, allowStartFade, allowEndFade, onScroll,
+                               isCloseToStart, isCloseToEnd, onScroll,
                                fadeColors, startFadeStyle, endFadeStyle, fadeSize, containerStyle, allowDivider,
                                innerRef, style, children, dividerStyle, ...rest
                            }) => {
